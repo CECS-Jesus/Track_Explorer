@@ -70,12 +70,11 @@ USB cable (for programming the microcontroller)
 
 Power supply 12 volts
 
-### Demo Video:
-https://youtube.com/shorts/poySFVOHSc8?si=13veGEQ6q29lasUS
-
-
 L298N H-bridge
 
 3 IR sensor’s
 
 2 DC motors
+
+### Demo Video:
+https://youtube.com/shorts/poySFVOHSc8?si=13veGEQ6q29lasUS
