@@ -12,10 +12,10 @@ void Motors_Init(void){
 		while ((SYSCTL_RCGC2_R&SYSCTL_RCGC2_GPIOA)==0){};
 	}	
 	GPIO_PORTA_AFSEL_R |= 0xC0;	// enable alt funct: PA7 and PA6 for PWM
-  GPIO_PORTA_PCTL_R &= ~0xFF000000; // PWM to be used
-  GPIO_PORTA_PCTL_R |= 0x55000000; // PWM to be used
+	GPIO_PORTA_PCTL_R &= ~0xFF000000; // PWM to be used
+	GPIO_PORTA_PCTL_R |= 0x55000000; // PWM to be used
 	GPIO_PORTA_DR8R_R |=0xC0;
-  GPIO_PORTA_DEN_R |= 0xC0;	// enable digital I/O 
+	GPIO_PORTA_DEN_R |= 0xC0;	// enable digital I/O 
 	//GPIO_PORTA_DR8R_R |= 0xC0;    // enable 8 mA drive on PA7, 6
 	
 	// Initializes PWM settings
@@ -26,7 +26,7 @@ void Motors_Init(void){
 	PWM1_1_GENA_R |= 0xC8;	// low on LOAD, high on CMPA down
 	PWM1_1_GENB_R |= 0xC08;// low on LOAD, high on CMPB down
 	PWM1_1_LOAD_R = Total_Period - 1;	// cycles needed to count down to 0
-  PWM1_1_CMPA_R = 0;	// count value when output rises
+	PWM1_1_CMPA_R = 0;	// count value when output rises
 	PWM1_1_CMPB_R = 0;	// count value when output rises
 	
 	PWM1_1_CTL_R |= 0x00000001;	// Enable PWM0 Generator 0 in Countdown mode
@@ -39,14 +39,14 @@ void Car_Dir_Init(void){
 		SYSCTL_RCGC2_R |= SYSCTL_RCGC2_GPIOB;	// Activate B clocks
 		while ((SYSCTL_RCGC2_R&SYSCTL_RCGC2_GPIOB)==0){};
 	}		
-  GPIO_PORTB_AMSEL_R &= ~0x3C;	// disable analog function
+	GPIO_PORTB_AMSEL_R &= ~0x3C;	// disable analog function
 	GPIO_PORTB_AFSEL_R &= ~0x3C;	// no alternate function
-  GPIO_PORTB_PCTL_R &= ~0x00FFFF00;	// GPIO clear bit PCTL 
+	GPIO_PORTB_PCTL_R &= ~0x00FFFF00;	// GPIO clear bit PCTL 
 	GPIO_PORTB_DIR_R |= 0x3C; // output on pin(s)
-  GPIO_PORTB_DEN_R |= 0x3C;	// enable digital I/O on pin(s)
+	GPIO_PORTB_DEN_R |= 0x3C;	// enable digital I/O on pin(s)
 }
 
 void PWMA_Duty(unsigned long duty_L, unsigned long duty_R){
-  PWM1_1_CMPA_R = duty_L - 1;             // 6) count value when output rises
+	PWM1_1_CMPA_R = duty_L - 1;             // 6) count value when output rises
 	PWM1_1_CMPB_R = duty_R - 1; 
 }
