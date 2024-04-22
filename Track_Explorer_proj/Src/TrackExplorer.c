@@ -1,6 +1,5 @@
 // TrackExplorer.c
 // Runs on TM4C123
-// This is the starter file for CECS 347 Project 2 - A Track Explorer
 // This project uses hardware PWM to control two DC Motors, 
 // ADC to collect analog inputs from three Sharp IR sensors.
 // The three Sharp analog IR distance sensors (GP2Y0A21YK0F) are used
@@ -61,85 +60,64 @@ extern void WaitForInterrupt(void);  // low power mode
                                 // with equal power to both motors (LeftH == RightH), the robot still may not drive straight
                                 // due to mechanical differences in the motors, so bias the left wheel faster or slower than
                                 // the constant right wheel
-#define LEFTPOWER        	0.60*Total_Period   // duty cycle of left wheel 
-#define RIGHTPOWER        0.60*Total_Period    // duty cycle of left wheel 
-//54 left 42 right
-#define START_SPEED1 			0.99*Total_Period
-#define START_SPEED2			0.97*Total_Period
-
+#define LEFTPOWER        0.60*Total_Period    // duty cycle of left wheel 
+#define RIGHTPOWER       0.60*Total_Period    // duty cycle of left wheel 
+#define START_SPEED1	0.99*Total_Period
+#define START_SPEED2	0.97*Total_Period
 
 void System_Init(void);
 void steering(uint16_t ahead_dist,uint16_t left_dist, uint16_t right_dist);
 void Delay(void);
 void GPIOPortF_Handler(void);
 
-
 int main(void){
-  uint16_t ahead, left, right;
-	
-  DisableInterrupts();  // disable interrupts while initializing
-  System_Init();
-  EnableInterrupts();   // enable after all initialization are done
-  //Calibrate the sensors: read at least 10 times from the sensor 
+	uint16_t ahead, left, right;	
+	DisableInterrupts();  // disable interrupts while initializing
+	System_Init();
+	EnableInterrupts();   // enable after all initialization are done
+	//Calibrate the sensors: read at least 10 times from the sensor 
 	// before the car starts to move: this will allow software to filter the sensor outputs.	
 	for(int x = 0; x < 10; x++){
 		ReadSensorsFIRFilter(&left, &ahead, &right);//sensor test
-  }
-	
-	GPIOPortF_Handler(); //call sw1 or sw2
-	WaitForInterrupt();
-	
-  while(1){
+	}
+	GPIOPortF_Handler();	//call sw1 or sw2
+	WaitForInterrupt();	//Wait to be activated by switch on mcu
+  	while(1){
 		ReadSensorsFIRFilter(&left, &ahead, &right);
 		steering(left,ahead,right); //set a breakpoint here once implemented sensor.c to check value if they are correct 	
 	}
-		LED = Blue;
-		PWM1_ENABLE_R &= ~0x0000000C; //disable wheels
+	LED = Blue;
+	PWM1_ENABLE_R &= ~0x0000000C; //disable wheels
 }
 
-
 void System_Init(void) {
-  PLL_Init();           // bus clock at 16 MHz
-  Sensors_Init();        // initialize ADC to sample AIN2 (PE1), AIN9 (PE4), AIN8 (PE5)
-  LEDSW_Init();         // configure onboard LEDs and push buttons
+	PLL_Init();           // bus clock at 16 MHz
+	Sensors_Init();        // initialize ADC to sample AIN2 (PE1), AIN9 (PE4), AIN8 (PE5)
+	LEDSW_Init();         // configure onboard LEDs and push buttons
 	Car_Dir_Init(); // control direction of L298N motor driver
-  Motors_Init();         // Initialize signals for the two DC Motors
+	Motors_Init();         // Initialize signals for the two DC Motors
 }
 
 void GPIOPortF_Handler(void){ // 
-  if(GPIO_PORTF_RIS_R&SW2){  // SW2 pressed
-    GPIO_PORTF_ICR_R = SW2;  // acknowledge flag0
+	if(GPIO_PORTF_RIS_R&SW2){  // SW2 pressed
+		GPIO_PORTF_ICR_R = SW2;  // acknowledge flag0
 		LED = Yellow;
 		PWM1_ENABLE_R &= ~0x0000000C; // stop both wheels
 		Delay();
 		WaitForInterrupt();
-		}
-	
+	}
 	if(GPIO_PORTF_RIS_R&SW1){  // SW1 pressed
-    GPIO_PORTF_ICR_R = SW1;  // acknowledge flag4
+		GPIO_PORTF_ICR_R = SW1;  // acknowledge flag4
 		PWMA_Duty(START_SPEED1, START_SPEED2);
 		LED = Green;
 		WHEEL_DIR = FORWARD;
 		PWM1_ENABLE_R |= 0x0000000C; // enable both wheels
 		Delay();
 		
-  }
+	}
 }
 
 void steering(uint16_t left_dist,uint16_t ahead_dist, uint16_t right_dist){
-  // Suggest the following simple control as starting point:
-  // 1. Take care of off center positions:
-	//    If left off center track, turn right; 
-	//    If right off center track, turn left
-  // 2. Take care of turning track: 
-	//    make a right turn if left opening detected;
-	//    make a left turn if right opening detected;
-  // 3. Optional: Take care of crach ahead: stop if crash ahead
-	// 4.	go straight if moving in the center area
-  // Feel free to add more controlls to fine tune your robot car.
-  // Make sure to take care of both wheel movements and LED display. 
-//	//STOP ALL WHEELS TO PREVENT CRASH	
-	
 	// when track is complete stop and shine blue LED 	
 	if(ahead_dist < IR80CM && right_dist < IR80CM  && left_dist < IR80CM ){
 		LED = Blue;
@@ -190,11 +168,11 @@ void steering(uint16_t left_dist,uint16_t ahead_dist, uint16_t right_dist){
 	}
 }
 
-
+//1 ms delay
 void Delay(void){
 	unsigned long volatile time;
-  time = 727240*100/91;  // 0.01sec
-  while(time){
+  	time = 727240*100/91;  // 0.01sec
+ 	 while(time){
 		time--;
-  }
+  	}
 }
